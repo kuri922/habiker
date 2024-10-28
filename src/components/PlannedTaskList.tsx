@@ -3,9 +3,10 @@ import { Box, Button, Flex, List, ListItem, Text, VStack } from "@chakra-ui/reac
 type PlannedTaskListProps = {
   tasks: string[];
   onCompleteTask: (task: string) => void;
+  bgColor: string;
 }
 
-export const PlannedTaskList = ({ tasks, onCompleteTask }: PlannedTaskListProps) => {
+export const PlannedTaskList = ({ tasks, onCompleteTask, bgColor }: PlannedTaskListProps) => {
 
   return (
     <VStack spacing={4} align="stretch">
@@ -13,7 +14,7 @@ export const PlannedTaskList = ({ tasks, onCompleteTask }: PlannedTaskListProps)
         予定タスク
       </Text>
       <Box
-        bg="green.100"
+        bg={bgColor}
         borderRadius="md"
         p={4}
         h="200px" // 高さを調整する

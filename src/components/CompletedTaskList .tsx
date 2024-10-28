@@ -3,16 +3,17 @@ import { Box, Flex, Text, VStack } from "@chakra-ui/react"
 
 type ConpletedTaskListProps = {
   comptasks: string[];
+  bgColor: string;
 }
 
-export const ConpletedTaskList = ({ comptasks }: ConpletedTaskListProps) => {
+export const ConpletedTaskList = ({ comptasks, bgColor }: ConpletedTaskListProps) => {
   return (
     <VStack spacing={4} align="stretch">
       <Text fontSize="2xl" fontWeight="bold">
         完了タスク
       </Text>
       <Box
-        bg="green.100"
+        bg={bgColor}
         borderRadius="md"
         p={4}
         h="200px" // 高さを調整する
