@@ -21,7 +21,8 @@ const MainLayout = () => {
   }
 
   /* 完了タスクへの移動関数 */
-  const handleCompleteTask = (task: string) => {
+  const handleCompleteTask = (task: string, actualTime: number) => {
+    console.log(`タスク: ${task}, 実績時間: ${actualTime}分`);
     setTasks((prevTasks) => prevTasks.filter((t) => t !== task));
     setCompleteTasks((prevTasks) => [...prevTasks, task]);
   }

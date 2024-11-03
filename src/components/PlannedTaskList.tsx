@@ -1,12 +1,29 @@
-import { Box, Button, Flex, List, ListItem, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Flex, List, ListItem, Text, useDisclosure, VStack } from "@chakra-ui/react";
+import { TaskModal } from "./TaskModal";
+import { useState } from "react";
 
 type PlannedTaskListProps = {
   tasks: string[];
-  onCompleteTask: (task: string) => void;
+  onCompleteTask: (task: string, actualTime: number) => void;
   bgColor: string;
 }
 
 export const PlannedTaskList = ({ tasks, onCompleteTask, bgColor }: PlannedTaskListProps) => {
+  //ポップアップの表示状態を管理するためのステート
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedTask, setSelectedTask] = useState<string | null>(null); // 選択されたタスク
+
+  const handleOpenModal = (task: string) => {
+    setSelectedTask(task);
+    onOpen();
+  }
+
+  const handleComplete = (actualTime: number) => {
+    if (selectedTask) {
+      onCompleteTask(selectedTask, actualTime);
+      onClose();
+    }
+  }
 
   return (
     <VStack spacing={4} align="stretch">
@@ -27,7 +44,7 @@ export const PlannedTaskList = ({ tasks, onCompleteTask, bgColor }: PlannedTaskL
                 <Text>
                   {task}
                 </Text>
-                <Button size="sm" colorScheme="green" onClick={() => { onCompleteTask(task) }}>
+                <Button size="sm" colorScheme="green" onClick={() => { handleOpenModal(task) }}>
                   完了
                 </Button>
               </Flex>
@@ -35,6 +52,8 @@ export const PlannedTaskList = ({ tasks, onCompleteTask, bgColor }: PlannedTaskL
           ))}
         </List>
       </Box>
+      {/* モーダルの表示 */}
+      <TaskModal isOpen={isOpen} onClose={onClose} onComplete={handleComplete} />
     </VStack>
   )
 
