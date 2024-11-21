@@ -1,12 +1,13 @@
-import { Box, Flex, Text, VStack } from "@chakra-ui/react"
+import { Box, Flex, List, ListItem, Text, VStack } from "@chakra-ui/react"
+import { Task } from "../Types/task";
 
 
 type ConpletedTaskListProps = {
-  comptasks: string[];
+  tasks: Task[];
   bgColor: string;
 }
 
-export const ConpletedTaskList = ({ comptasks, bgColor }: ConpletedTaskListProps) => {
+export const ConpletedTaskList = ({ tasks, bgColor }: ConpletedTaskListProps) => {
   return (
     <VStack spacing={4} align="stretch">
       <Text fontSize="2xl" fontWeight="bold">
@@ -20,9 +21,15 @@ export const ConpletedTaskList = ({ comptasks, bgColor }: ConpletedTaskListProps
         overflowY="auto" // スクロール対応
       >
         <Flex justifyContent="space-between">
-          <Text>
-            {comptasks}
-          </Text>
+          <List spacing={3}>
+            {tasks.map((task, index) => (
+              <ListItem key={index}>
+                <Text>
+                  {task.task_content}
+                </Text>
+              </ListItem>
+            ))}
+          </List>
         </Flex>
       </Box>
     </VStack>

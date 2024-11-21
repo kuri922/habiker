@@ -1,9 +1,11 @@
 import { Box, Button, Flex, List, ListItem, Text, useDisclosure, VStack } from "@chakra-ui/react";
 import { TaskModal } from "./TaskModal";
 import { useState } from "react";
+import { Task } from "../Types/task";
+
 
 type PlannedTaskListProps = {
-  tasks: string[];
+  tasks: Task[];
   onCompleteTask: (task: string, actualTime: number) => void;
   bgColor: string;
 }
@@ -42,9 +44,9 @@ export const PlannedTaskList = ({ tasks, onCompleteTask, bgColor }: PlannedTaskL
             <ListItem key={index}>
               <Flex justifyContent="space-between">
                 <Text>
-                  {task}
+                  {task.task_content}
                 </Text>
-                <Button size="sm" colorScheme="green" onClick={() => { handleOpenModal(task) }}>
+                <Button size="sm" colorScheme="green" onClick={() => { handleOpenModal(task.task_content) }}>
                   完了
                 </Button>
               </Flex>
