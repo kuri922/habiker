@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 
+//予定タスク登録
 export const addTask = (req, res, next) => {
   const { task_content, category_id } = req.body;
 
@@ -36,3 +37,23 @@ export const addTask = (req, res, next) => {
     res.status(201).json({ message: "タスクが登録されました", result });
   });
 };
+
+//メニュー選択時に予定タスク取得
+export const getTaskByCategory = (req, res) => {
+  const { category_id } = req.query;
+
+  if (!category_id) {
+    return res.status(400).json({ error: "カテゴリーIDが必要です" });
+  }
+
+  const query = `SELECT * FROM planned_tasks WHERE category_id = ?`;
+
+  db.query(query, [category_id], (err, results) => {
+    if (err) {
+      console.error("タスク取得エラー", err);
+      return res.status(500).json({ error: "タスクの取得に失敗しました" });
+    }
+    res.status(200).json(results);
+  })
+}
+

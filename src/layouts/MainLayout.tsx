@@ -1,5 +1,5 @@
 // src/layouts/MainLayout.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Flex, HStack, VStack } from "@chakra-ui/react";
 import { SideMenu } from "../components/SideMenu";
 import { TaskInput } from "../components/TaskInput";
@@ -39,6 +39,28 @@ const MainLayout = () => {
       alert("サーバーエラーが発生しました");
     }
   };
+
+  /* メニュー選択時に予定タスク取得関数 */
+  const fetchTask = async (categoryId: number) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/tasks?category_id=${categoryId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setTasks(data);
+        console.log("取得したタスク:", data);
+      } else {
+        console.error("タスク取得失敗:", response.statusText)
+      }
+    } catch {
+      console.error("タスク取得エラー")
+    }
+  }
+
+  //メニューで項目が変更されたらタスク再取得
+  //selectCategoryが変わるタブにAPIを呼び出す
+  useEffect(() => {
+    fetchTask(selectedCategory);
+  }, [selectedCategory]);
 
   /* 完了タスクへの移動関数 */
   const handleCompleteTask = (taskContent: string, actualTime: number) => {

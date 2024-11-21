@@ -13,16 +13,17 @@ type PlannedTaskListProps = {
 export const PlannedTaskList = ({ tasks, onCompleteTask, bgColor }: PlannedTaskListProps) => {
   //ポップアップの表示状態を管理するためのステート
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedTask, setSelectedTask] = useState<string | null>(null); // 選択されたタスク
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-  const handleOpenModal = (task: string) => {
+
+  const handleOpenModal = (task: Task) => {
     setSelectedTask(task);
     onOpen();
   }
 
   const handleComplete = (actualTime: number) => {
     if (selectedTask) {
-      onCompleteTask(selectedTask, actualTime);
+      onCompleteTask(selectedTask.task_content, actualTime);
       onClose();
     }
   }
@@ -46,7 +47,7 @@ export const PlannedTaskList = ({ tasks, onCompleteTask, bgColor }: PlannedTaskL
                 <Text>
                   {task.task_content}
                 </Text>
-                <Button size="sm" colorScheme="green" onClick={() => { handleOpenModal(task.task_content) }}>
+                <Button size="sm" colorScheme="green" onClick={() => { handleOpenModal(task) }}>
                   完了
                 </Button>
               </Flex>
