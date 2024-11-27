@@ -11,6 +11,7 @@ type PlannedTaskListProps = {
 }
 
 export const PlannedTaskList = ({ tasks, onCompleteTask, bgColor }: PlannedTaskListProps) => {
+  //console.log("PlannedTaskListに渡されたtasks:", tasks);
   //ポップアップの表示状態を管理するためのステート
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -41,7 +42,7 @@ export const PlannedTaskList = ({ tasks, onCompleteTask, bgColor }: PlannedTaskL
         overflowY="auto" // スクロール対応
       >
         <List spacing={3}>
-          {tasks.map((task, index) => (
+          {(tasks || []).map((task, index) => (
             <ListItem key={index}>
               <Flex justifyContent="space-between">
                 <Text>

@@ -7,7 +7,8 @@ type ConpletedTaskListProps = {
   bgColor: string;
 }
 
-export const ConpletedTaskList = ({ tasks, bgColor }: ConpletedTaskListProps) => {
+export const CompletedTaskList = ({ tasks = [], bgColor }: ConpletedTaskListProps) => {
+  //console.log("CompletedTaskListに渡されたtasks:", tasks);
   return (
     <VStack spacing={4} align="stretch">
       <Text fontSize="2xl" fontWeight="bold">

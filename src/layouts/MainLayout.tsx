@@ -4,7 +4,7 @@ import { Box, Flex, HStack, VStack } from "@chakra-ui/react";
 import { SideMenu } from "../components/SideMenu";
 import { TaskInput } from "../components/TaskInput";
 import { PlannedTaskList } from "../components/PlannedTaskList";
-import { ConpletedTaskList } from "../components/CompletedTaskList ";
+import { CompletedTaskList } from "../components/CompletedTaskList ";
 import { categoryColors } from "../constants/colors";
 import { Task } from "../Types/task";
 
@@ -13,7 +13,7 @@ const MainLayout = () => {
   /* 予定タスク情報 */
   const [tasks, setTasks] = useState<Task[]>([]);
   /* 完了タスク情報 */
-  const [compeltetasks, setCompleteTasks] = useState<Task[]>([]);
+  const [completetasks, setCompleteTasks] = useState<Task[]>([]);
   /* 背景色取得情報 */
   const [selectedCategory, setSelectedCategory] = useState<number>(1);
 
@@ -46,8 +46,10 @@ const MainLayout = () => {
       const response = await fetch(`http://localhost:3000/api/tasks?category_id=${categoryId}`);
       if (response.ok) {
         const data = await response.json();
-        setTasks(data);
-        console.log("取得したタスク:", data);
+
+        setTasks(data.plannedTasks);
+        setCompleteTasks(data.completedTasks);
+
       } else {
         console.error("タスク取得失敗:", response.statusText)
       }
@@ -56,14 +58,15 @@ const MainLayout = () => {
     }
   }
 
-  //メニューで項目が変更されたらタスク再取得
-  //selectCategoryが変わるタブにAPIを呼び出す
+
   useEffect(() => {
-    fetchTask(selectedCategory);
+    if (selectedCategory) {
+      fetchTask(selectedCategory);
+    }
   }, [selectedCategory]);
 
   /* 完了タスクへの移動関数 */
-  const handleCompleteTask = (taskContent: string, actualTime: number) => {
+  const handleCompleteTask = async (taskContent: string, actualTime: number) => {
     // 完了タスクを検索
     const completedTask = tasks.find((task) => task.task_content === taskContent);
 
@@ -74,6 +77,39 @@ const MainLayout = () => {
       // 実績時間を追加して完了リストに移動
       const updatedTask = { ...completedTask, actualTime };
       setCompleteTasks((prevTasks) => [...prevTasks, updatedTask]);
+
+      // 送信データをコンソールで確認
+      const requestData = {
+        task_content: updatedTask.task_content,
+        category_id: updatedTask.category_id,
+        actual_minutes: actualTime,
+      };
+
+      console.log("送信データ:", requestData);
+
+      //完了タスクのDB登録
+      try {
+        const response = await fetch("http://localhost:3000/api/complete-task", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            task_content: updatedTask.task_content,
+            category_id: updatedTask.category_id,
+            actual_minutes: updatedTask.actualTime,
+          }),
+        });
+
+        if (response.ok) {
+          console.log("完了タスクがDBに登録されました")
+        } else {
+          console.error("完了タスク登録失敗", response.statusText);
+          alert("完了タスクの登録に失敗しました")
+        }
+
+      } catch (error) {
+        console.error("完了タスク登録エラー:", error);
+        alert("サーバーエラーが発生しました");
+      }
     }
   }
 
@@ -91,7 +127,7 @@ const MainLayout = () => {
               <PlannedTaskList tasks={tasks} onCompleteTask={handleCompleteTask} bgColor={categoryColors[selectedCategory]} />
             </Box >
             <Box>
-              <ConpletedTaskList tasks={compeltetasks} bgColor={categoryColors[selectedCategory]} />
+              <CompletedTaskList tasks={completetasks} bgColor={categoryColors[selectedCategory]} />
             </Box>
 
           </VStack>
