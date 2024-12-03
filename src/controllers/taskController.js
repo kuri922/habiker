@@ -96,7 +96,6 @@ export const setCompleteTask = (req, res) => {
       }
       res.status(200).json(results);
 
-
       //完了したタスクをplanned_tasksテーブルから削除
       const deleteQuery = `
       DELETE FROM planned_tasks WHERE task_content = ? AND category_id = ?`;
