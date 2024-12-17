@@ -1,5 +1,5 @@
 // src/layouts/MainLayout.tsx
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Box, Flex, HStack, VStack } from "@chakra-ui/react";
 import { SideMenu } from "../components/SideMenu";
 import { TaskInput } from "../components/TaskInput";
@@ -7,6 +7,8 @@ import { PlannedTaskList } from "../components/PlannedTaskList";
 import { CompletedTaskList } from "../components/CompletedTaskList ";
 import { categoryColors } from "../constants/colors";
 import { Task } from "../Types/task";
+import { FixedChart } from "../components/Chart";
+import { ChartData } from "../Types/ChartData"
 
 
 const MainLayout = () => {
@@ -16,11 +18,12 @@ const MainLayout = () => {
   const [completetasks, setCompleteTasks] = useState<Task[]>([]);
   /* 背景色取得情報 */
   const [selectedCategory, setSelectedCategory] = useState<number>(1);
+  /* グラフ表示用データ取得情報 */
+  const [chartData, setChartData] = useState<ChartData[]>([]);
 
   /* 予定タスクへの追加関数 */
   const handleAddTask = async (newTaskContent: string) => {
     const newTask = { task_content: newTaskContent, category_id: selectedCategory };
-    console.log("送信データ:", JSON.stringify(newTask));
     try {
       const response = await fetch("http://localhost:3000/api/add-task", {
         method: "POST",
@@ -30,7 +33,6 @@ const MainLayout = () => {
 
       if (response.ok) {
         setTasks((prevTasks) => [...prevTasks, newTask]);
-        alert("タスクが登録されました");
       } else {
         alert("登録に失敗しました");
       }
@@ -40,7 +42,7 @@ const MainLayout = () => {
     }
   };
 
-  /* メニュー選択時に予定タスク取得関数 */
+  /* メニュー選択時に予定タスクと完了タスク取得関数 */
   const fetchTask = async (categoryId: number) => {
     try {
       const response = await fetch(`http://localhost:3000/api/tasks?category_id=${categoryId}`);
@@ -57,7 +59,6 @@ const MainLayout = () => {
       console.error("タスク取得エラー")
     }
   }
-
 
   useEffect(() => {
     if (selectedCategory) {
@@ -77,15 +78,6 @@ const MainLayout = () => {
       // 実績時間を追加して完了リストに移動
       const updatedTask = { ...completedTask, actualTime };
       setCompleteTasks((prevTasks) => [...prevTasks, updatedTask]);
-
-      // 送信データをコンソールで確認
-      const requestData = {
-        task_content: updatedTask.task_content,
-        category_id: updatedTask.category_id,
-        actual_minutes: actualTime,
-      };
-
-      console.log("送信データ:", requestData);
 
       //完了タスクのDB登録
       try {
@@ -113,6 +105,31 @@ const MainLayout = () => {
     }
   }
 
+  const fetchChartData = useCallback(async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api//chart-tasks");
+      if (response.ok) {
+        const data = await response.json();
+
+        // total_time を数値型に変換
+        const formattedData = data.map((item: { category_id: number; total_time: string }) => ({
+          ...item,
+          total_time: Number(item.total_time),
+        }));
+
+        setChartData(formattedData);
+      } else {
+        console.error("グラフデータ取得失敗:", response.statusText);
+      }
+    } catch (error) {
+      console.error("グラフデータ取得エラー:", error);
+    }
+  }, []); // 空の依存配列にすることで、一度だけ関数を生成
+
+  useEffect(() => {
+    fetchChartData();
+  }, [fetchChartData]); // fetchChartDataの依存関係のみを設定
+
   return (
 
     <Flex overflow="hidden" left="0">
@@ -124,13 +141,16 @@ const MainLayout = () => {
             <TaskInput onAddTask={handleAddTask} />
             < Box mb={1}>
               {/* タスク配列をPlannedTaskListに渡す */}
-              <PlannedTaskList tasks={tasks} onCompleteTask={handleCompleteTask} bgColor={categoryColors[selectedCategory]} />
+              <PlannedTaskList tasks={tasks} onCompleteTask={handleCompleteTask} bgColor={categoryColors[selectedCategory].color} />
             </Box >
             <Box>
-              <CompletedTaskList tasks={completetasks} bgColor={categoryColors[selectedCategory]} />
+              <CompletedTaskList tasks={completetasks} bgColor={categoryColors[selectedCategory].color} />
             </Box>
 
           </VStack>
+        </Box>
+        <Box mt="-200px">
+          <FixedChart data={chartData} />
         </Box>
       </HStack >
     </Flex >

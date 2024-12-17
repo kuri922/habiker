@@ -1,5 +1,5 @@
 import express from 'express';
-import { addTask, getTaskByCategory, setCompleteTask } from '../controllers/taskController.js';
+import { addTask, getTaskByCategory, setCompleteTask, getComletedTask } from '../controllers/taskController.js';
 
 const router = express.Router();
 
@@ -17,5 +17,8 @@ router.get('/tasks', (req, res, next) => {
 router.post('/complete-task', (req, res, next) => {
   next();
 }, setCompleteTask);
+
+//タスク完了登録エンドポイント
+router.get('/chart-tasks', getComletedTask);
 
 export default router;
